@@ -15,9 +15,9 @@ services:
   # PHP-FPM
   php:
     build: .
-    volumes:
-      - .:/var/www/html
-      - storage:/var/www/html/storage
+    entrypoint: ["sh", "-c"]
+    command: >
+      "composer install --optimize-autoloader --no-dev && php-fpm"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
