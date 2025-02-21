@@ -1,0 +1,1 @@
+-- It's first script for DB
