@@ -24,12 +24,16 @@
 
 ```
 /docker
+  ├── app/
+  │   ├── Dockerfile
   ├── nginx/
   │   ├── nginx.conf
-  ├── db/
+  │   ├── Dockerfile
+  ├── pgsql/
   │   ├── dumps/
-  │   │   ├── dumpfortest.sql
-Dockerfile
+  │   │   ├── dumpfortest.sql // Добавляется вручную
+  ├── vite/
+  │   ├── Dockerfile
 docker-compose.yml
 ```
 
@@ -40,35 +44,41 @@ docker-compose.yml
     ```sh
     docker-compose up
     ```
-3. После успешного запуска доступность контейнеров можно проверить командой:
+3. Установка пакетов `composer`:
+    ```sh
+    docker composer install
+    ```
+4. Запуск миграций 
+    ```sh
+    docker exec -it php php artisan migrate
+    ```
+4. После успешного запуска доступность контейнеров можно проверить командой:
     ```sh
     docker ps
     ```
 
 ## Описание контейнеров
 
-### 1. `web` (Nginx)
+### 1. `nginx` (Nginx)
 
--   Использует `nginx:alpine`
+-   Собирается из `docker/nginx/Dockerfile`
 -   Настроен через `docker/nginx/nginx.conf`
 -   Проксирует запросы на PHP-FPM
 -   Доступен на порту `8080`
 
 ### 2. `php` (PHP-FPM + Laravel)
 
--   Собирается из `Dockerfile`
+-   Собирается из `docker/app/Dockerfile`
 -   Включает PHP 8.3 с необходимыми расширениями
--   Устанавливает зависимости Laravel через `composer install`
--   Работает в связке с `web` и `db`
 
-### 3. `db` (PostgreSQL 15)
+### 3. `postgres` (PostgreSQL 15)
 
 -   Образ `postgres:15`
 -   Данные хранятся в volume `postgres_data`
--   Доступен на порту `5433`
+-   Доступен на порту `5432`
 
 ### 4. `vite` (Frontend Dev Server)
-
+-   Собирается из `docker/vite/Dockerfile`
 -   Запускает `npm run watch`
 -   Следит за изменениями в `frontend` и обновляет страницу автоматически
 -   Доступен на порту `3000`
@@ -109,7 +119,7 @@ docker-compose.yml
     ```
 -   Войти в контейнер базы данных:
     ```sh
-    docker exec -it scatgaming-db-1 psql -U postgres -d scat
+    docker exec -it postgres psql -U postgres -d scat
     ```
 
 ### Обновление базы данных
@@ -118,13 +128,13 @@ docker-compose.yml
 2. Провести дамп Базы Данных
 
     ```sh
-    docker exec -i scatgaming-db-1 psql -U postgres -d scat < docker/db/dumps/dumpfortest.sql
+    docker exec -i postgres psql -U postgres -d scat < docker/db/dumps/dumpfortest.sql
     ```
 
 ### Запуск миграций
 
 ```sh
-docker compose exec php php artisan migrate
+docker exec -it php php artisan migrate
 ```
 
 ## Очищение контейнеров и данных
@@ -140,6 +150,6 @@ docker compose exec php php artisan migrate
 
 ## Дополнительно
 
--   Настройки Laravel находятся в `.env.local`
+-   Настройки Laravel находятся в `.env.local` (перенести данные в .env)
 -   Конфигурация Nginx в `docker/nginx/nginx.conf`
 -   Доп. документация находится в `docs`

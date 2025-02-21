@@ -18,13 +18,13 @@
 ### По SSH (рекомендуемый способ)
 
 ```sh
-git@github.com:Frederic-Marshall/SCATgaming.git
+git clone git@github.com:Frederic-Marshall/SCATgaming.git
 ```
 
 ### По HTTPS
 
 ```sh
-https://github.com/Frederic-Marshall/SCATgaming.git
+git clone https://github.com/Frederic-Marshall/SCATgaming.git
 ```
 
 ## Работа с форками
