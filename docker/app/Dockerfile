@@ -33,3 +33,11 @@ COPY . .
 
 # Устанавливаем зависимости Laravel через Composer
 RUN composer install
+
+# Даем все права www-data (пользователь PHP-FPM)
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Запускаем PHP-FPM
+CMD ["php-fpm"]
