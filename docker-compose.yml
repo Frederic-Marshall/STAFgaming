@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: php
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - app-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: nginx
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8001:80"
+    networks:
+      - app-network
+    depends_on:
+      - php
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: laravel
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  vite:
+    image: node:18
+    container_name: vite
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "watch"]
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
